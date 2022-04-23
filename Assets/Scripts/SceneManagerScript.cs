@@ -78,12 +78,13 @@ public class SceneManagerScript : MonoBehaviour
         _ws.Send(json);
     }
     
-    public void PlayerShoot(Position shootVector)
+    public void PlayerShoot(Position shootVector, Position shootPosition)
     {
-        var playerShootMessage = new ClientMessagePlayerShoot()
+        var playerShootMessage = new ClientMessagePlayerShoot
         {
             Player = _mainPlayerModel,
-            ShootVector = shootVector
+            ShootVector = shootVector,
+            ShootPosition = shootPosition
         };
         
         var json = JsonConvert.SerializeObject(playerShootMessage);
@@ -135,13 +136,20 @@ public class SceneManagerScript : MonoBehaviour
 
     private void HandleServerMessage(string messageJson)
     {
-        var messageType = JsonConvert.DeserializeObject<MessageBase>(messageJson)?.MessageType;
+        try
+        {
+            var messageType = JsonConvert.DeserializeObject<MessageBase>(messageJson)?.MessageType;
 
-        if (messageType == null) return;
-        
-        if (!_handleServerMessageDictionary.ContainsKey(messageType)) return;
+            if (messageType == null) return;
 
-        _handleServerMessageDictionary[messageType](messageJson);
+            if (!_handleServerMessageDictionary.ContainsKey(messageType)) return;
+
+            _handleServerMessageDictionary[messageType](messageJson);
+        }
+        catch(Exception e)
+        {
+            Debug.Log(e.Message);
+        }
     }
 
     private void HandlePlayerEnterServerMessage(string messageJson)
@@ -179,19 +187,25 @@ public class SceneManagerScript : MonoBehaviour
 
     private void HandlePlayerShootMessage(string messageJson)
     {
+        Debug.Log(messageJson);
         var gameStateMessage = JsonConvert.DeserializeObject<ServerMessagePlayerShoot>(messageJson);
 
         if (gameStateMessage == null) return;
 
-        var player = 
-            GetComponents<PlayerController>()
-            .SingleOrDefault(el => el.Id == gameStateMessage.Player.Id);
+        Debug.LogError("got messagge shhoot");
 
-        if (player == null) return;
+        var players =
+            FindObjectsOfType<PlayerController>();
+
+        var player = players.SingleOrDefault(el => el.id == gameStateMessage.Player.Id);
+
+        if (player == null || player.isMainPlayer) return;
+
+        Debug.LogError("player foouund");
 
         player.CreateBullet(gameStateMessage.Player.Position, gameStateMessage.ShootVector);
     }
-    
+
     private void HandleGameStateServerMessage(string messageJson)
     {
         var gameStateMessage = JsonConvert.DeserializeObject<MessageGameState>(messageJson);

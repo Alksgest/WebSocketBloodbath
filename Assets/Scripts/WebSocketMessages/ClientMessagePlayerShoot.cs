@@ -13,5 +13,6 @@ namespace WebSocketMessages
         
         public Player Player { get; set; }
         public Position ShootVector { get; set; }
+        public Position ShootPosition { get; set; }
     }
 }

@@ -1,11 +1,13 @@
 using Models;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Controllers
 {
     public class PlayerController : MonoBehaviour
     {
-        public string Id { get; private set; }
+        [SerializeField]
+        public string id;
         public bool isMainPlayer;
         public SceneManagerScript sceneManager;
 
@@ -20,7 +22,7 @@ namespace Controllers
 
         public void Init(string id)
         {
-            Id = id;
+            this.id = id;
         }
         
         private void Start()
@@ -45,13 +47,15 @@ namespace Controllers
         {
             if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.R))
             {
-                var bullet = Instantiate(bulletPrefab, bulletInitialPosition.position, Quaternion.identity);
+                var shootPosition = bulletInitialPosition.position;
+                
+                var bullet = Instantiate(bulletPrefab, shootPosition, Quaternion.identity);
                 var bulletRb = bullet.GetComponent<Rigidbody>();
 
                 var velocity = transform.forward * bulletSpeed * Time.deltaTime;
                 bulletRb.velocity = velocity;
                 
-                sceneManager.PlayerShoot(velocity);
+                sceneManager.PlayerShoot(velocity, shootPosition);
             }
         }
         
@@ -65,7 +69,7 @@ namespace Controllers
             var bulletRb = bullet.GetComponent<Rigidbody>();
             bulletRb.velocity = new Vector3(shootVector.X, shootVector.Y, shootVector.Z);
                 
-            sceneManager.PlayerShoot(shootVector);
+            sceneManager.PlayerShoot(shootVector, shootPosition);
         }
 
         private void HandleMovement()
