@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Constants;
 using Controllers;
+using Models;
 using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketMessages;
@@ -27,8 +30,20 @@ public class SceneManagerScript : MonoBehaviour
     private readonly Queue<string> _gameServerMessageQueue = new();
 
 
+    private Dictionary<string, Action<string>> _handleServerMessageDictionary;
+
+
     private void Start()
     {
+        _handleServerMessageDictionary = new Dictionary<string, Action<string>>
+        {
+            {ServerMessageType.PlayerEnter, HandlePlayerEnterServerMessage},
+            {ServerMessageType.PlayerExit, HandlePlayerExitServerMessage},
+            {ServerMessageType.PlayerUpdate, HandlePlayerUpdateServerMessage},
+            {ServerMessageType.GameState, HandleGameStateServerMessage},
+            {ServerMessageType.PlayerShoot, HandlePlayerShootMessage}
+        };
+        
         InitWebSocketClient();
         InitMainPlayer();
     }
@@ -62,6 +77,18 @@ public class SceneManagerScript : MonoBehaviour
         var json = JsonConvert.SerializeObject(playerUpdateMessage);
         _ws.Send(json);
     }
+    
+    public void PlayerShoot(Position shootVector)
+    {
+        var playerShootMessage = new ClientMessagePlayerShoot()
+        {
+            Player = _mainPlayerModel,
+            ShootVector = shootVector
+        };
+        
+        var json = JsonConvert.SerializeObject(playerShootMessage);
+        _ws.Send(json);
+    }
 
     // IMPLEMENTATION METHODS
 
@@ -78,10 +105,13 @@ public class SceneManagerScript : MonoBehaviour
         var playerPos = new Vector3(0, 1, 0);
         _mainPlayerGo = Instantiate(playerPrefab, playerPos, Quaternion.identity);
         var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerController>();
+        
+        var uuid = Guid.NewGuid().ToString();
+
         mainPlayerScript.sceneManager = this;
         mainPlayerScript.isMainPlayer = true;
+        mainPlayerScript.Init(uuid);
         // create player model
-        var uuid = System.Guid.NewGuid().ToString();
         _mainPlayerModel = new Player
         {
             Id = uuid,
@@ -92,8 +122,7 @@ public class SceneManagerScript : MonoBehaviour
         {
             Player = _mainPlayerModel
         };
-
-
+        
         var json = JsonConvert.SerializeObject(playerEnterMessage);
         _ws.Send(json);
     }
@@ -106,25 +135,13 @@ public class SceneManagerScript : MonoBehaviour
 
     private void HandleServerMessage(string messageJson)
     {
-        // parse message type
-        var messageType = JsonConvert.DeserializeObject<ServerMessageGeneric>(messageJson)?.MessageType;
-        // route message to handler based on message type
-        if (messageType == ServerMessageType.PlayerEnter)
-        {
-            HandlePlayerEnterServerMessage(messageJson);
-        }
-        else if (messageType == ServerMessageType.PlayerExit)
-        {
-            HandlePlayerExitServerMessage(messageJson);
-        }
-        else if (messageType == ServerMessageType.PlayerUpdate)
-        {
-            HandlePlayerUpdateServerMessage(messageJson);
-        }
-        else if (messageType == ServerMessageType.GameState)
-        {
-            HandleGameStateServerMessage(messageJson);
-        }
+        var messageType = JsonConvert.DeserializeObject<MessageBase>(messageJson)?.MessageType;
+
+        if (messageType == null) return;
+        
+        if (!_handleServerMessageDictionary.ContainsKey(messageType)) return;
+
+        _handleServerMessageDictionary[messageType](messageJson);
     }
 
     private void HandlePlayerEnterServerMessage(string messageJson)
@@ -159,16 +176,32 @@ public class SceneManagerScript : MonoBehaviour
         }
     }
 
+
+    private void HandlePlayerShootMessage(string messageJson)
+    {
+        var gameStateMessage = JsonConvert.DeserializeObject<ServerMessagePlayerShoot>(messageJson);
+
+        if (gameStateMessage == null) return;
+
+        var player = 
+            GetComponents<PlayerController>()
+            .SingleOrDefault(el => el.Id == gameStateMessage.Player.Id);
+
+        if (player == null) return;
+
+        player.CreateBullet(gameStateMessage.Player.Position, gameStateMessage.ShootVector);
+    }
+    
     private void HandleGameStateServerMessage(string messageJson)
     {
-        var gameStateMessage = JsonConvert.DeserializeObject<ServerMessageGameState>(messageJson);
+        var gameStateMessage = JsonConvert.DeserializeObject<MessageGameState>(messageJson);
         foreach (var player in gameStateMessage.GameState.Players)
         {
             AddOtherPlayerFromPlayerModel(player);
         }
     }
 
-    private void AddOtherPlayerFromPlayerModel(Player otherPlayerModel)
+    private void AddOtherPlayerFromPlayerModel(ISharedObject otherPlayerModel)
     {
         if (otherPlayerModel.Id == _mainPlayerModel.Id ||
             _playerIdToOtherPlayerGo.ContainsKey(otherPlayerModel.Id)) return;
@@ -186,6 +219,7 @@ public class SceneManagerScript : MonoBehaviour
         var otherPlayerScript = otherPlayerGo.GetComponent<PlayerController>();
         otherPlayerScript.sceneManager = this;
         otherPlayerScript.isMainPlayer = false;
+        otherPlayerScript.Init(otherPlayerModel.Id);
         _playerIdToOtherPlayerGo.Add(otherPlayerModel.Id, otherPlayerGo);
     }
 }

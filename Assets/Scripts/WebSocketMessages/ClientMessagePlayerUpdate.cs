@@ -1,11 +1,16 @@
 ﻿using System;
+using Models;
 
 namespace WebSocketMessages
 {
     [Serializable]
-    public class ClientMessagePlayerUpdate
+    public class ClientMessagePlayerUpdate : MessageBase
     {
-        public string MessageType => "CLIENT_MESSAGE_TYPE_PLAYER_UPDATE";
+        public ClientMessagePlayerUpdate()
+        {
+            MessageType = "CLIENT_MESSAGE_TYPE_PLAYER_UPDATE";
+        }
+        
         public Player Player { get; set; }
     }
 }

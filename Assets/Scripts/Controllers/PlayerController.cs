@@ -1,9 +1,11 @@
+using Models;
 using UnityEngine;
 
 namespace Controllers
 {
     public class PlayerController : MonoBehaviour
     {
+        public string Id { get; private set; }
         public bool isMainPlayer;
         public SceneManagerScript sceneManager;
 
@@ -12,17 +14,21 @@ namespace Controllers
         [SerializeField] private float moveSpeed = 10f;
         [SerializeField] private float rotationSpeed = 200f;
         [SerializeField] private float bulletSpeed = 100f;
-
-
+        
         [SerializeField] private GameObject bulletPrefab;
         [SerializeField] private Transform bulletInitialPosition;
 
+        public void Init(string id)
+        {
+            Id = id;
+        }
+        
         private void Start()
         {
             _rigidbody = GetComponent<Rigidbody>();
             if (!isMainPlayer)
             {
-
+                
             }
         }
 
@@ -31,12 +37,40 @@ namespace Controllers
             if (isMainPlayer)
             {
                 HandleMovement();
+                HandleShooting();
             }
+        }
+
+        private void HandleShooting()
+        {
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.R))
+            {
+                var bullet = Instantiate(bulletPrefab, bulletInitialPosition.position, Quaternion.identity);
+                var bulletRb = bullet.GetComponent<Rigidbody>();
+
+                var velocity = transform.forward * bulletSpeed * Time.deltaTime;
+                bulletRb.velocity = velocity;
+                
+                sceneManager.PlayerShoot(velocity);
+            }
+        }
+        
+        public void CreateBullet(Position shootPosition, Position shootVector)
+        {
+            var bullet = Instantiate(
+                bulletPrefab, 
+                new Vector3(shootPosition.X, shootPosition.Y, shootPosition.Z),
+                Quaternion.identity);
+            
+            var bulletRb = bullet.GetComponent<Rigidbody>();
+            bulletRb.velocity = new Vector3(shootVector.X, shootVector.Y, shootVector.Z);
+                
+            sceneManager.PlayerShoot(shootVector);
         }
 
         private void HandleMovement()
         {
-            var targetPos = transform.position;
+           
             if (Input.anyKey)
             {
                 // left
@@ -87,15 +121,7 @@ namespace Controllers
                 {
                     transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
                 }
-
-                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.R))
-                {
-                    var bullet = Instantiate(bulletPrefab, bulletInitialPosition.position, Quaternion.identity);
-                    var bulletRb = bullet.GetComponent<Rigidbody>();
-
-                    bulletRb.velocity = transform.forward * bulletSpeed * Time.deltaTime;
-                }
-
+                
                 sceneManager.SyncPlayerState(gameObject);
             }
         }

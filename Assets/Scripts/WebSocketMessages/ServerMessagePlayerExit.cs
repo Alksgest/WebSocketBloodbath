@@ -3,9 +3,8 @@
 namespace WebSocketMessages
 {
     [Serializable]
-    public class ServerMessagePlayerExit
+    public class ServerMessagePlayerExit : ServerMessage
     {
-        public string MessageType { get; set; }
-        public Player Player { get; set; }
+        
     }
 }

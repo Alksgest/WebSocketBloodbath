@@ -1,11 +1,11 @@
 ﻿using System;
+using Models;
 
 namespace WebSocketMessages
 {
     [Serializable]
-    public class ServerMessageGameState
+    public class MessageGameState : MessageBase
     {
-        public string MessageType { get; set; }
         public GameState GameState { get; set; }
     }
 }

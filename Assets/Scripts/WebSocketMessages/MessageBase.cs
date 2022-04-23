@@ -3,7 +3,7 @@
 namespace WebSocketMessages
 {
     [Serializable]
-    public class ServerMessageGeneric
+    public class MessageBase
     {
         public string MessageType { get; set; }
     }
