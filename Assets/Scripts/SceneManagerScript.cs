@@ -55,7 +55,9 @@ public class SceneManagerScript : MonoBehaviour
         {
             Player = _mainPlayerModel
         };
-        _ws.Send(JsonUtility.ToJson(playerUpdateMessage));
+        
+        var json = JsonConvert.SerializeObject(playerUpdateMessage);
+        _ws.Send(json);
     }
 
     // IMPLEMENTATION METHODS
@@ -90,7 +92,6 @@ public class SceneManagerScript : MonoBehaviour
 
 
         var json = JsonConvert.SerializeObject(playerEnterMessage);
-        Debug.Log(json);
         _ws.Send(json);
     }
 
