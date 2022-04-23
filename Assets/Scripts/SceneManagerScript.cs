@@ -69,6 +69,7 @@ public class SceneManagerScript : MonoBehaviour
     {
         // send "player update" message to server
         _mainPlayerModel.Position = playerGo.transform.position;
+        _mainPlayerModel.Rotation = playerGo.transform.rotation.eulerAngles;
         var playerUpdateMessage = new ClientMessagePlayerUpdate
         {
             Player = _mainPlayerModel
@@ -149,6 +150,7 @@ public class SceneManagerScript : MonoBehaviour
         catch(Exception e)
         {
             Debug.Log(e.Message);
+            Debug.Log(e.StackTrace);
         }
     }
 
@@ -180,7 +182,13 @@ public class SceneManagerScript : MonoBehaviour
                 playerModel.Position.Y,
                 playerModel.Position.Z
             );
+            var rotation = new Vector3(
+                playerModel.Rotation.X,
+                playerModel.Rotation.Y,
+                playerModel.Rotation.Z);
+            
             _playerIdToOtherPlayerGo[playerModel.Id].transform.position = newPosition;
+            _playerIdToOtherPlayerGo[playerModel.Id].transform.Rotate(rotation);
         }
     }
 
@@ -192,8 +200,7 @@ public class SceneManagerScript : MonoBehaviour
 
         if (gameStateMessage == null) return;
 
-        Debug.LogError("got messagge shhoot");
-
+        //TODO: use _playerIdToOtherPlayerGo
         var players =
             FindObjectsOfType<PlayerController>();
 
@@ -201,9 +208,7 @@ public class SceneManagerScript : MonoBehaviour
 
         if (player == null || player.isMainPlayer) return;
 
-        Debug.LogError("player foouund");
-
-        player.CreateBullet(gameStateMessage.Player.Position, gameStateMessage.ShootVector);
+        player.CreateBullet(gameStateMessage.ShootPosition, gameStateMessage.ShootVector);
     }
 
     private void HandleGameStateServerMessage(string messageJson)
