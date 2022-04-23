@@ -76,14 +76,8 @@ public class PlayerScript : MonoBehaviour
             }
         }
 
-        // if (targetPos != transform.position)
-        // {
-        //     transform.position = Vector3.MoveTowards(
-        //         transform.position,
-        //         targetPos,
-        //         Time.deltaTime * moveSpeed
-        //     );
-        //     sceneManager.SyncPlayerState(gameObject);
-        // }
+        if (targetPos == transform.position) return;
+        
+        sceneManager.SyncPlayerState(gameObject);
     }
 }

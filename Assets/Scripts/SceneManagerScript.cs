@@ -48,10 +48,7 @@ public class SceneManagerScript : MonoBehaviour
     public void SyncPlayerState(GameObject playerGo)
     {
         // send "player update" message to server
-        _mainPlayerModel.position = new Position(
-            playerGo.transform.position.x,
-            playerGo.transform.position.y
-        );
+        _mainPlayerModel.Position = playerGo.transform.position;
         var playerUpdateMessage = new ClientMessagePlayerUpdate(_mainPlayerModel);
         _ws.Send(JsonUtility.ToJson(playerUpdateMessage));
     }
@@ -75,8 +72,11 @@ public class SceneManagerScript : MonoBehaviour
         mainPlayerScript.isMainPlayer = true;
         // create player model
         var uuid = System.Guid.NewGuid().ToString();
-        var pos = new Position(transform.position.x, transform.position.y);
-        _mainPlayerModel = new Player(uuid, pos);
+        _mainPlayerModel = new Player
+        {
+            Id = uuid,
+            Position = transform.position
+        };
         // send "player enter" message to server
         var playerEnterMessage = new ClientMessagePlayerEnter(_mainPlayerModel);
         _ws.Send(JsonUtility.ToJson(playerEnterMessage));
@@ -120,7 +120,7 @@ public class SceneManagerScript : MonoBehaviour
     private void HandlePlayerExitServerMessage(string messageJson)
     {
         var playerExitMessage = JsonUtility.FromJson<ServerMessagePlayerExit>(messageJson);
-        var playerId = playerExitMessage.player.id;
+        var playerId = playerExitMessage.player.Id;
         if (_playerIdToOtherPlayerGo.ContainsKey(playerId))
         {
             Destroy(_playerIdToOtherPlayerGo[playerId]);
@@ -132,14 +132,14 @@ public class SceneManagerScript : MonoBehaviour
     {
         var playerUpdateMessage = JsonUtility.FromJson<ServerMessagePlayerUpdate>(messageJson);
         var playerModel = playerUpdateMessage.player;
-        if (_playerIdToOtherPlayerGo.ContainsKey(playerModel.id))
+        if (_playerIdToOtherPlayerGo.ContainsKey(playerModel.Id))
         {
             var newPosition = new Vector3(
-                playerModel.position.x,
-                playerModel.position.y,
+                playerModel.Position.x,
+                playerModel.Position.y,
                 0
             );
-            _playerIdToOtherPlayerGo[playerModel.id].transform.position = newPosition;
+            _playerIdToOtherPlayerGo[playerModel.Id].transform.position = newPosition;
         }
     }
 
@@ -156,13 +156,13 @@ public class SceneManagerScript : MonoBehaviour
     {
         // player is not main player and player is not currently tracked
         if (
-            otherPlayerModel.id != _mainPlayerModel.id
-            && !_playerIdToOtherPlayerGo.ContainsKey(otherPlayerModel.id)
+            otherPlayerModel.Id != _mainPlayerModel.Id
+            && !_playerIdToOtherPlayerGo.ContainsKey(otherPlayerModel.Id)
         )
         {
             var otherPlayerPosition = new Vector3(
-                otherPlayerModel.position.x,
-                otherPlayerModel.position.y,
+                otherPlayerModel.Position.x,
+                otherPlayerModel.Position.y,
                 0
             );
             var otherPlayerGo = Instantiate(
@@ -173,7 +173,7 @@ public class SceneManagerScript : MonoBehaviour
             var otherPlayerScript = otherPlayerGo.GetComponent<PlayerScript>();
             otherPlayerScript.sceneManager = this;
             otherPlayerScript.isMainPlayer = false;
-            _playerIdToOtherPlayerGo.Add(otherPlayerModel.id, otherPlayerGo);
+            _playerIdToOtherPlayerGo.Add(otherPlayerModel.Id, otherPlayerGo);
         }
     }
 }
