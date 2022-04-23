@@ -114,10 +114,12 @@ public class SceneManagerScript : MonoBehaviour
         mainPlayerScript.isMainPlayer = true;
         mainPlayerScript.Init(uuid);
         // create player model
+        var playerTransform = transform;
         _mainPlayerModel = new Player
         {
             Id = uuid,
-            Position = transform.position
+            Position = playerTransform.position,
+            Rotation = playerTransform.rotation.eulerAngles
         };
         // send "player enter" message to server
         var playerEnterMessage = new ClientMessagePlayerEnter
