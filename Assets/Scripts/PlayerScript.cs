@@ -1,34 +1,21 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-
-    public SceneManagerScript sceneManager;
     public bool isMainPlayer;
+    public SceneManagerScript sceneManager;
 
-    // use for testing if you want to connect multiple players to the server and
-    // see them moving
-    public bool autopilotOn = false;
+    private Rigidbody _rigidbody;
 
-    [SerializeField]
-    private float moveSpeed = 10f;
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float rotationSpeed = 200f;
 
-    // autopilot movement for testing
-    private readonly List<Vector3> _moveDirections = new()
+    private void Start()
     {
-        Vector3.up,
-        Vector3.right,
-        Vector3.down,
-        Vector3.left
-    };
-    private int currMoveDirIndex = 0;
-    
-    void Start()
-    {
+        _rigidbody = GetComponent<Rigidbody>();
         if (!isMainPlayer)
         {
-            // gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+
         }
     }
 
@@ -39,7 +26,7 @@ public class PlayerScript : MonoBehaviour
             HandleMovement();
         }
     }
-    
+
 
     private void HandleMovement()
     {
@@ -49,35 +36,48 @@ public class PlayerScript : MonoBehaviour
             // left
             if (Input.GetKey(KeyCode.A))
             {
-                transform.Translate(-moveSpeed * Time.deltaTime,0,0);
+                var newPosition = _rigidbody.position + transform.TransformDirection (-moveSpeed * Time.deltaTime, 0, 0);
+                _rigidbody.MovePosition (newPosition);
+                // transform.Translate(-moveSpeed * Time.deltaTime, 0, 0);
             }
+
             // right
             if (Input.GetKey(KeyCode.D))
             {
-                transform.Translate(moveSpeed * Time.deltaTime,0,0);
+                var newPosition = _rigidbody.position + transform.TransformDirection (moveSpeed * Time.deltaTime, 0, 0);
+                _rigidbody.MovePosition (newPosition);
+                // transform.Translate(moveSpeed * Time.deltaTime, 0, 0);
             }
+
             // up
             if (Input.GetKey(KeyCode.W))
             {
-                transform.Translate(0,0,moveSpeed * Time.deltaTime);
+                var newPosition = _rigidbody.position + transform.TransformDirection (0, 0, moveSpeed * Time.deltaTime);
+                _rigidbody.MovePosition (newPosition);
+                // transform.Translate(0, 0, moveSpeed * Time.deltaTime);
             }
+
             // down
             if (Input.GetKey(KeyCode.S))
             {
-                transform.Translate(0,0,-moveSpeed * Time.deltaTime);
+                var newPosition = _rigidbody.position + transform.TransformDirection (0, 0, -moveSpeed * Time.deltaTime);
+                _rigidbody.MovePosition (newPosition);
+                // transform.Translate(0, 0, -moveSpeed * Time.deltaTime);
             }
+
             if (Input.GetKey(KeyCode.Q))
             {
-                transform.Rotate(new Vector3(0, -1, 0));
+                transform.Rotate(new Vector3(0, -rotationSpeed * Time.deltaTime, 0));
             }
+
             if (Input.GetKey(KeyCode.E))
             {
-                transform.Rotate(new Vector3(0, 1, 0));
+                transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
             }
         }
 
         if (targetPos == transform.position) return;
-        
+
         sceneManager.SyncPlayerState(gameObject);
     }
 }

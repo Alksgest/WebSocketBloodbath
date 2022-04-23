@@ -110,6 +110,7 @@ GameObject:
   - component: {fileID: 3512521403255721215}
   - component: {fileID: 6767995628474358800}
   - component: {fileID: 8712421701624765549}
+  - component: {fileID: 3377380318824675672}
   m_Layer: 0
   m_Name: OtherPlayer
   m_TagString: Untagged
@@ -213,6 +214,22 @@ MonoBehaviour:
   isMainPlayer: 0
   autopilotOn: 0
   moveSpeed: 10
+--- !u!54 &3377380318824675672
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250482551163265358}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 116
+  m_CollisionDetection: 0
 --- !u!1 &3217291747763003970
 GameObject:
   m_ObjectHideFlags: 0
