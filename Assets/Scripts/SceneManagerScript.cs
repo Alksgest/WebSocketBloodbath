@@ -69,7 +69,7 @@ public class SceneManagerScript : MonoBehaviour
     {
         // send "player update" message to server
         _mainPlayerModel.Position = playerGo.transform.position;
-        _mainPlayerModel.Rotation = playerGo.transform.rotation.eulerAngles;
+        _mainPlayerModel.Rotation = playerGo.transform.rotation;
         var playerUpdateMessage = new ClientMessagePlayerUpdate
         {
             Player = _mainPlayerModel
@@ -119,7 +119,7 @@ public class SceneManagerScript : MonoBehaviour
         {
             Id = uuid,
             Position = playerTransform.position,
-            Rotation = playerTransform.rotation.eulerAngles
+            Rotation = playerTransform.rotation
         };
         // send "player enter" message to server
         var playerEnterMessage = new ClientMessagePlayerEnter
@@ -179,18 +179,9 @@ public class SceneManagerScript : MonoBehaviour
         var playerModel = playerUpdateMessage.Player;
         if (_playerIdToOtherPlayerGo.ContainsKey(playerModel.Id))
         {
-            var newPosition = new Vector3(
-                playerModel.Position.X,
-                playerModel.Position.Y,
-                playerModel.Position.Z
-            );
-            var rotation = new Vector3(
-                playerModel.Rotation.X,
-                playerModel.Rotation.Y,
-                playerModel.Rotation.Z);
-            
-            _playerIdToOtherPlayerGo[playerModel.Id].transform.position = newPosition;
-            _playerIdToOtherPlayerGo[playerModel.Id].transform.Rotate(rotation);
+
+            _playerIdToOtherPlayerGo[playerModel.Id].transform.position = playerModel.Position;
+            _playerIdToOtherPlayerGo[playerModel.Id].transform.rotation = playerModel.Rotation;
         }
     }
 
@@ -227,20 +218,18 @@ public class SceneManagerScript : MonoBehaviour
         if (otherPlayerModel.Id == _mainPlayerModel.Id ||
             _playerIdToOtherPlayerGo.ContainsKey(otherPlayerModel.Id)) return;
         
-        var otherPlayerPosition = new Vector3(
-            otherPlayerModel.Position.X,
-            otherPlayerModel.Position.Y,
-            otherPlayerModel.Position.Z
-        );
         var otherPlayerGo = Instantiate(
             otherPlayerPrefab,
-            otherPlayerPosition,
+            otherPlayerModel.Position,
             Quaternion.identity
         );
+        
         var otherPlayerScript = otherPlayerGo.GetComponent<PlayerController>();
+        
         otherPlayerScript.sceneManager = this;
         otherPlayerScript.isMainPlayer = false;
         otherPlayerScript.Init(otherPlayerModel.Id);
+        
         _playerIdToOtherPlayerGo.Add(otherPlayerModel.Id, otherPlayerGo);
     }
 }

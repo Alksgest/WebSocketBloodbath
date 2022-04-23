@@ -7,6 +7,6 @@ namespace Models
     {
         public string Id { get; set; }
         public Position Position { get; set; }
-        public Position Rotation { get; set; }
+        public Rotation Rotation { get; set; }
     }
 }
