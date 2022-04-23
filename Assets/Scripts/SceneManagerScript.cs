@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Constants;
+using Controllers;
 using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketMessages;
@@ -76,7 +77,7 @@ public class SceneManagerScript : MonoBehaviour
         // create player game object
         var playerPos = new Vector3(0, 1, 0);
         _mainPlayerGo = Instantiate(playerPrefab, playerPos, Quaternion.identity);
-        var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerScript>();
+        var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerController>();
         mainPlayerScript.sceneManager = this;
         mainPlayerScript.isMainPlayer = true;
         // create player model
@@ -169,26 +170,22 @@ public class SceneManagerScript : MonoBehaviour
 
     private void AddOtherPlayerFromPlayerModel(Player otherPlayerModel)
     {
-        // player is not main player and player is not currently tracked
-        if (
-            otherPlayerModel.Id != _mainPlayerModel.Id
-            && !_playerIdToOtherPlayerGo.ContainsKey(otherPlayerModel.Id)
-        )
-        {
-            var otherPlayerPosition = new Vector3(
-                otherPlayerModel.Position.X,
-                otherPlayerModel.Position.Y,
-                otherPlayerModel.Position.Z
-            );
-            var otherPlayerGo = Instantiate(
-                otherPlayerPrefab,
-                otherPlayerPosition,
-                Quaternion.identity
-            );
-            var otherPlayerScript = otherPlayerGo.GetComponent<PlayerScript>();
-            otherPlayerScript.sceneManager = this;
-            otherPlayerScript.isMainPlayer = false;
-            _playerIdToOtherPlayerGo.Add(otherPlayerModel.Id, otherPlayerGo);
-        }
+        if (otherPlayerModel.Id == _mainPlayerModel.Id ||
+            _playerIdToOtherPlayerGo.ContainsKey(otherPlayerModel.Id)) return;
+        
+        var otherPlayerPosition = new Vector3(
+            otherPlayerModel.Position.X,
+            otherPlayerModel.Position.Y,
+            otherPlayerModel.Position.Z
+        );
+        var otherPlayerGo = Instantiate(
+            otherPlayerPrefab,
+            otherPlayerPosition,
+            Quaternion.identity
+        );
+        var otherPlayerScript = otherPlayerGo.GetComponent<PlayerController>();
+        otherPlayerScript.sceneManager = this;
+        otherPlayerScript.isMainPlayer = false;
+        _playerIdToOtherPlayerGo.Add(otherPlayerModel.Id, otherPlayerGo);
     }
 }

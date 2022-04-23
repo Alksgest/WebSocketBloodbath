@@ -214,6 +214,10 @@ MonoBehaviour:
   sceneManager: {fileID: 0}
   moveSpeed: 10
   rotationSpeed: 200
+  bulletSpeed: 100
+  bulletPrefab: {fileID: 6998228986047347182, guid: e8c3fe61590b96b4f802fbe7b0e37f96,
+    type: 3}
+  bulletInitialPosition: {fileID: 0}
 --- !u!54 &3377380318824675672
 Rigidbody:
   m_ObjectHideFlags: 0
