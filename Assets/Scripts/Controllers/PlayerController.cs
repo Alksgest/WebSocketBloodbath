@@ -68,8 +68,6 @@ namespace Controllers
             
             var bulletRb = bullet.GetComponent<Rigidbody>();
             bulletRb.velocity = new Vector3(shootVector.X, shootVector.Y, shootVector.Z);
-                
-            sceneManager.PlayerShoot(shootVector, shootPosition);
         }
 
         private void HandleMovement()
