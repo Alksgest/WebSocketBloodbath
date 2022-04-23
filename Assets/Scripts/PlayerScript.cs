@@ -64,6 +64,13 @@ public class PlayerScript : MonoBehaviour
                 _rigidbody.MovePosition (newPosition);
                 // transform.Translate(0, 0, -moveSpeed * Time.deltaTime);
             }
+            
+            if (Input.GetKey(KeyCode.Space))
+            {
+                var newPosition = _rigidbody.position + transform.TransformDirection(0, Time.deltaTime * 10, 0);
+                _rigidbody.MovePosition (newPosition);
+                // transform.Translate(0, 0, -moveSpeed * Time.deltaTime);
+            }
 
             if (Input.GetKey(KeyCode.Q))
             {
@@ -74,10 +81,8 @@ public class PlayerScript : MonoBehaviour
             {
                 transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
             }
+            
+            sceneManager.SyncPlayerState(gameObject);
         }
-
-        if (targetPos == transform.position) return;
-
-        sceneManager.SyncPlayerState(gameObject);
     }
 }

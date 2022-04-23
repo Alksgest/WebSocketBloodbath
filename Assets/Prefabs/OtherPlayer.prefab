@@ -210,10 +210,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c9d63ecad181454ea293d5d21a000dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneManager: {fileID: 0}
   isMainPlayer: 0
-  autopilotOn: 0
+  sceneManager: {fileID: 0}
   moveSpeed: 10
+  rotationSpeed: 200
 --- !u!54 &3377380318824675672
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -228,7 +228,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 116
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!1 &3217291747763003970
 GameObject:
