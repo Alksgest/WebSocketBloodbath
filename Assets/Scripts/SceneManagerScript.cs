@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Constants;
 using UnityEngine;
+using WebSocketMessages;
 using WebSocketSharp;
 
 public class SceneManagerScript : MonoBehaviour
@@ -49,7 +50,10 @@ public class SceneManagerScript : MonoBehaviour
     {
         // send "player update" message to server
         _mainPlayerModel.Position = playerGo.transform.position;
-        var playerUpdateMessage = new ClientMessagePlayerUpdate(_mainPlayerModel);
+        var playerUpdateMessage = new ClientMessagePlayerUpdate
+        {
+            Player = _mainPlayerModel
+        };
         _ws.Send(JsonUtility.ToJson(playerUpdateMessage));
     }
 
@@ -78,7 +82,10 @@ public class SceneManagerScript : MonoBehaviour
             Position = transform.position
         };
         // send "player enter" message to server
-        var playerEnterMessage = new ClientMessagePlayerEnter(_mainPlayerModel);
+        var playerEnterMessage = new ClientMessagePlayerEnter
+        {
+            Player = _mainPlayerModel
+        };
         _ws.Send(JsonUtility.ToJson(playerEnterMessage));
     }
 
@@ -91,7 +98,7 @@ public class SceneManagerScript : MonoBehaviour
     private void HandleServerMessage(string messageJson)
     {
         // parse message type
-        var messageType = JsonUtility.FromJson<ServerMessageGeneric>(messageJson).messageType;
+        var messageType = JsonUtility.FromJson<ServerMessageGeneric>(messageJson)?.MessageType;
         // route message to handler based on message type
         if (messageType == ServerMessageType.PlayerEnter)
         {
@@ -114,13 +121,13 @@ public class SceneManagerScript : MonoBehaviour
     private void HandlePlayerEnterServerMessage(string messageJson)
     {
         var playerEnterMessage = JsonUtility.FromJson<ServerMessagePlayerEnter>(messageJson);
-        AddOtherPlayerFromPlayerModel(playerEnterMessage.player);
+        AddOtherPlayerFromPlayerModel(playerEnterMessage.Player);
     }
 
     private void HandlePlayerExitServerMessage(string messageJson)
     {
         var playerExitMessage = JsonUtility.FromJson<ServerMessagePlayerExit>(messageJson);
-        var playerId = playerExitMessage.player.Id;
+        var playerId = playerExitMessage.Player.Id;
         if (_playerIdToOtherPlayerGo.ContainsKey(playerId))
         {
             Destroy(_playerIdToOtherPlayerGo[playerId]);
@@ -131,7 +138,7 @@ public class SceneManagerScript : MonoBehaviour
     private void HandlePlayerUpdateServerMessage(string messageJson)
     {
         var playerUpdateMessage = JsonUtility.FromJson<ServerMessagePlayerUpdate>(messageJson);
-        var playerModel = playerUpdateMessage.player;
+        var playerModel = playerUpdateMessage.Player;
         if (_playerIdToOtherPlayerGo.ContainsKey(playerModel.Id))
         {
             var newPosition = new Vector3(
@@ -146,7 +153,7 @@ public class SceneManagerScript : MonoBehaviour
     private void HandleGameStateServerMessage(string messageJson)
     {
         var gameStateMessage = JsonUtility.FromJson<ServerMessageGameState>(messageJson);
-        foreach (var player in gameStateMessage.gameState.players)
+        foreach (var player in gameStateMessage.GameState.Players)
         {
             AddOtherPlayerFromPlayerModel(player);
         }

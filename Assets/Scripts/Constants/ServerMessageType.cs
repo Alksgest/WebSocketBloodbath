@@ -1,6 +1,6 @@
 ﻿namespace Constants
 {
-    public class ServerMessageType
+    public static class ServerMessageType
     {
         public const string PlayerEnter = "SERVER_MESSAGE_TYPE_PLAYER_ENTER";
         public const string PlayerExit = "SERVER_MESSAGE_TYPE_PLAYER_EXIT";
