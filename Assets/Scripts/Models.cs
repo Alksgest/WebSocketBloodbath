@@ -13,5 +13,22 @@ public class GameState
 public class Player
 {
     public string Id { get; set; }
-    public Vector3 Position { get; set; }
+    public Position Position { get; set; }
+}
+
+public class Position
+{
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
+
+    public static implicit operator Position(Vector3 vec)
+    {
+        return new Position
+        {
+            X = vec.x,
+            Y = vec.y,
+            Z = vec.z
+        };
+    }
 }

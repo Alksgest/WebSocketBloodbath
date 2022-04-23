@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Constants;
+using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketMessages;
 using WebSocketSharp;
@@ -86,7 +87,11 @@ public class SceneManagerScript : MonoBehaviour
         {
             Player = _mainPlayerModel
         };
-        _ws.Send(JsonUtility.ToJson(playerEnterMessage));
+
+
+        var json = JsonConvert.SerializeObject(playerEnterMessage);
+        Debug.Log(json);
+        _ws.Send(json);
     }
 
     private void QueueServerMessage(object sender, MessageEventArgs e)
@@ -142,9 +147,9 @@ public class SceneManagerScript : MonoBehaviour
         if (_playerIdToOtherPlayerGo.ContainsKey(playerModel.Id))
         {
             var newPosition = new Vector3(
-                playerModel.Position.x,
-                playerModel.Position.y,
-                0
+                playerModel.Position.X,
+                playerModel.Position.Y,
+                playerModel.Position.Z
             );
             _playerIdToOtherPlayerGo[playerModel.Id].transform.position = newPosition;
         }
@@ -168,9 +173,9 @@ public class SceneManagerScript : MonoBehaviour
         )
         {
             var otherPlayerPosition = new Vector3(
-                otherPlayerModel.Position.x,
-                otherPlayerModel.Position.y,
-                0
+                otherPlayerModel.Position.X,
+                otherPlayerModel.Position.Y,
+                otherPlayerModel.Position.Z
             );
             var otherPlayerGo = Instantiate(
                 playerPrefab,
