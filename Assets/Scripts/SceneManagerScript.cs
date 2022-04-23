@@ -7,13 +7,15 @@ using WebSocketSharp;
 
 public class SceneManagerScript : MonoBehaviour
 {
-
-    public GameObject playerPrefab;
+    [SerializeField]
+    private GameObject playerPrefab;
+    [SerializeField]
+    private GameObject otherPlayerPrefab;
 
     private WebSocket _ws;
-    private const string GameServerUrl = "ws://localhost:5000";
+    // private const string GameServerUrl = "ws://localhost:5000";
 
-    // private const string GameServerUrl = "ws://5.tcp.eu.ngrok.io:15226";
+    private const string GameServerUrl = "ws://0.tcp.eu.ngrok.io:14522";
 
     private Player _mainPlayerModel;
     private GameObject _mainPlayerGo;
@@ -104,7 +106,7 @@ public class SceneManagerScript : MonoBehaviour
     private void HandleServerMessage(string messageJson)
     {
         // parse message type
-        var messageType = JsonUtility.FromJson<ServerMessageGeneric>(messageJson)?.MessageType;
+        var messageType = JsonConvert.DeserializeObject<ServerMessageGeneric>(messageJson)?.MessageType;
         // route message to handler based on message type
         if (messageType == ServerMessageType.PlayerEnter)
         {
@@ -126,13 +128,13 @@ public class SceneManagerScript : MonoBehaviour
 
     private void HandlePlayerEnterServerMessage(string messageJson)
     {
-        var playerEnterMessage = JsonUtility.FromJson<ServerMessagePlayerEnter>(messageJson);
+        var playerEnterMessage = JsonConvert.DeserializeObject<ServerMessagePlayerEnter>(messageJson);
         AddOtherPlayerFromPlayerModel(playerEnterMessage.Player);
     }
 
     private void HandlePlayerExitServerMessage(string messageJson)
     {
-        var playerExitMessage = JsonUtility.FromJson<ServerMessagePlayerExit>(messageJson);
+        var playerExitMessage = JsonConvert.DeserializeObject<ServerMessagePlayerExit>(messageJson);
         var playerId = playerExitMessage.Player.Id;
         if (_playerIdToOtherPlayerGo.ContainsKey(playerId))
         {
@@ -143,7 +145,7 @@ public class SceneManagerScript : MonoBehaviour
 
     private void HandlePlayerUpdateServerMessage(string messageJson)
     {
-        var playerUpdateMessage = JsonUtility.FromJson<ServerMessagePlayerUpdate>(messageJson);
+        var playerUpdateMessage = JsonConvert.DeserializeObject<ServerMessagePlayerUpdate>(messageJson);
         var playerModel = playerUpdateMessage.Player;
         if (_playerIdToOtherPlayerGo.ContainsKey(playerModel.Id))
         {
@@ -158,7 +160,7 @@ public class SceneManagerScript : MonoBehaviour
 
     private void HandleGameStateServerMessage(string messageJson)
     {
-        var gameStateMessage = JsonUtility.FromJson<ServerMessageGameState>(messageJson);
+        var gameStateMessage = JsonConvert.DeserializeObject<ServerMessageGameState>(messageJson);
         foreach (var player in gameStateMessage.GameState.Players)
         {
             AddOtherPlayerFromPlayerModel(player);
@@ -179,7 +181,7 @@ public class SceneManagerScript : MonoBehaviour
                 otherPlayerModel.Position.Z
             );
             var otherPlayerGo = Instantiate(
-                playerPrefab,
+                otherPlayerPrefab,
                 otherPlayerPosition,
                 Quaternion.identity
             );
