@@ -1,3 +1,4 @@
+using Managers;
 using Models;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,7 +10,7 @@ namespace Controllers
         [SerializeField]
         public string id;
         public bool isMainPlayer;
-        public SceneManagerScript sceneManager;
+        public GameManager gameManager;
 
         private Rigidbody _rigidbody;
 
@@ -55,7 +56,7 @@ namespace Controllers
                 var velocity = transform.forward * bulletSpeed * Time.deltaTime;
                 bulletRb.velocity = velocity;
                 
-                sceneManager.PlayerShoot(velocity, shootPosition);
+                gameManager.PlayerShoot(velocity, shootPosition);
             }
         }
         
@@ -125,7 +126,7 @@ namespace Controllers
                 }
                 
                 
-                sceneManager.SyncPlayerState(gameObject);
+                gameManager.SyncPlayerState(gameObject);
             }
         }
     }

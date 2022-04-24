@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Models
 {
+    [Serializable]
     public class Position
     {
         public float X { get; set; }
@@ -24,7 +26,7 @@ namespace Models
         }
     }
 
-
+    [Serializable]
     public class Rotation
     {
         public float X { get; set; }
