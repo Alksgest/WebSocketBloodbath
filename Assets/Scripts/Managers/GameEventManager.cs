@@ -11,6 +11,7 @@ namespace Managers
         private void Awake()
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         
         // public void InvokeShipLanded(object sender, IVisitable target)

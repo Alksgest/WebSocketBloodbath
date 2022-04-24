@@ -16,6 +16,11 @@ namespace Controllers
         [SerializeField] private TMP_InputField nameInput;
         [SerializeField] private TMP_InputField urlInput;
         
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+        
         private void Start()
         {
             var settings = SettingsManager.GameSettings;
@@ -31,6 +36,11 @@ namespace Controllers
             {
                 mainMenu.SetActive(!mainMenu.activeSelf);
             }
+        }
+
+        public void StartGame()
+        {
+            SceneManager.LoadScene(SceneNumber.SandBox);
         }
 
         public void SetActiveMainMenu(bool active)

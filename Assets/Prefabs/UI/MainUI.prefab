@@ -2408,6 +2408,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainMenu: {fileID: 1675491043810296327}
   optionsMenu: {fileID: 1675491044209200827}
+  nameInput: {fileID: 1675491044397261296}
+  urlInput: {fileID: 1675491043405559809}
 --- !u!1 &1675491044108670553
 GameObject:
   m_ObjectHideFlags: 0
