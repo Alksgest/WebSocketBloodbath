@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Constants;
 using Controllers;
 using Models;
@@ -13,6 +12,8 @@ namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
+        public static GameManager Instance;
+        
         [SerializeField] private GameObject playerPrefab;
         [SerializeField] private GameObject otherPlayerPrefab;
 
@@ -23,8 +24,8 @@ namespace Managers
         private Player _mainPlayerModel;
         private GameObject _mainPlayerGo;
 
-        private readonly IDictionary<string, PlayerController> _playerIdToPlayer =
-            new Dictionary<string, PlayerController>();
+        private readonly IDictionary<string, PlayerControllerBase> _playerIdToPlayer =
+            new Dictionary<string, PlayerControllerBase>();
 
         private readonly Queue<string> _gameServerMessageQueue = new();
 
@@ -32,6 +33,7 @@ namespace Managers
 
         private void Awake()
         {
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
 
@@ -105,11 +107,7 @@ namespace Managers
             var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerController>();
 
             var uuid = Guid.NewGuid().ToString();
-
-            mainPlayerScript.gameManager = this;
-            mainPlayerScript.isMainPlayer = true;
-            mainPlayerScript.Init(uuid);
-
+            
             var playerTransform = transform;
             _mainPlayerModel = new Player
             {
@@ -122,6 +120,8 @@ namespace Managers
                     Hp = 100
                 }
             };
+            
+            mainPlayerScript.Init(_mainPlayerModel);
 
             var playerEnterMessage = new ClientMessagePlayerEnter
             {
@@ -178,7 +178,7 @@ namespace Managers
 
             if (!_playerIdToPlayer.ContainsKey(playerId)) return;
 
-            Destroy(_playerIdToPlayer[playerId]);
+            _playerIdToPlayer[playerId].DestroyPlayer(); 
             _playerIdToPlayer.Remove(playerId);
         }
 
@@ -207,9 +207,9 @@ namespace Managers
 
             var player = _playerIdToPlayer[gameStateMessage.Player.Id];
 
-            if (player.isMainPlayer) return;
+            if (player is PlayerController) return;
 
-            player.CreateBullet(gameStateMessage.ShootPosition, gameStateMessage.ShootVector);
+            player.CreateBullet(gameStateMessage);
         }
 
         private void HandleGameStateServerMessage(string messageJson)
@@ -220,11 +220,13 @@ namespace Managers
 
             foreach (var player in gameStateMessage.GameState.Players)
             {
+                // TODO: remove this code after backend changes
+                player.PlayerStats ??= new PlayerStats();
                 AddOtherPlayer(player);
             }
         }
 
-        private void AddOtherPlayer(ISharedObject otherPlayerModel)
+        private void AddOtherPlayer(Player otherPlayerModel)
         {
             if (otherPlayerModel.Id == _mainPlayerModel.Id ||
                 _playerIdToPlayer.ContainsKey(otherPlayerModel.Id)) return;
@@ -235,11 +237,9 @@ namespace Managers
                 Quaternion.identity
             );
 
-            var playerController = otherPlayerGo.GetComponent<PlayerController>();
-
-            playerController.gameManager = this;
-            playerController.isMainPlayer = false;
-            playerController.Init(otherPlayerModel.Id);
+            var playerController = otherPlayerGo.GetComponent<PlayerControllerBase>();
+            
+            playerController.Init(otherPlayerModel);
 
             _playerIdToPlayer.Add(otherPlayerModel.Id, playerController);
         }

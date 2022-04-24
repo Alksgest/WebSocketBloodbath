@@ -6,9 +6,27 @@ namespace Models
     [Serializable]
     public class Position
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
+        [SerializeField] private float x;
+        [SerializeField] private float y;
+        [SerializeField] private float z;
+
+        public float X
+        {
+            get => x;
+            set => x = value;
+        }
+
+        public float Y
+        {
+            get => y;
+            set => y = value;
+        }
+
+        public float Z
+        {
+            get => z;
+            set => z = value;
+        }
 
         public static implicit operator Position(Vector3 vec)
         {
@@ -19,35 +37,10 @@ namespace Models
                 Z = vec.z
             };
         }
-        
+
         public static implicit operator Vector3(Position rValue)
         {
             return new Vector3(rValue.X, rValue.Y, rValue.Z);
-        }
-    }
-
-    [Serializable]
-    public class Rotation
-    {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
-        public float W { get; set; }
-        
-        public static implicit operator Quaternion(Rotation rValue)
-        {
-            return new Quaternion(rValue.X, rValue.Y, rValue.Z, rValue.W);
-        }
-        
-        public static implicit operator Rotation(Quaternion rValue)
-        {
-            return new Rotation
-            {
-                W = rValue.w,
-                X = rValue.x,
-                Y = rValue.y,
-                Z = rValue.z,
-            };
         }
     }
 }

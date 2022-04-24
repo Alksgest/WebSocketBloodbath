@@ -1,11 +1,24 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Models
 {
     [Serializable]
-    public class Bullet : ISharedObject
+    public class Bullet
     {
-        public string Id { get; set; }
-        public Position Position { get; set; }
+        [SerializeField] private string id;
+        [SerializeField] private string playerId;
+
+        public string Id
+        {
+            get => id;
+            set => id = value;
+        }
+
+        public string PlayerId
+        {
+            get => playerId;
+            set => playerId = value;
+        }
     }
 }

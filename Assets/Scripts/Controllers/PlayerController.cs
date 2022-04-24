@@ -1,116 +1,91 @@
+using System;
 using Managers;
 using Models;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Controllers
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : PlayerControllerBase
     {
-        [SerializeField] public string id;
-        public bool isMainPlayer;
-        public GameManager gameManager;
-
-        private Rigidbody _rigidbody;
-
-        [SerializeField] private float moveSpeed = 10f;
-        [SerializeField] private float rotationSpeed = 200f;
-        [SerializeField] private float bulletSpeed = 100f;
-
-        [SerializeField] private GameObject bulletPrefab;
-        [SerializeField] private Transform bulletInitialPosition;
-
-        public void Init(string id)
+        public override void Init(Player p)
         {
-            this.id = id;
+            base.Init(p);
+            
+            GameEventManager.Instance.InvokeHpChanged(this, player.PlayerStats.Hp);
         }
 
-        private void Start()
+        protected override void OnCollisionEnter(Collision collision)
         {
-            _rigidbody = GetComponent<Rigidbody>();
-            if (!isMainPlayer)
-            {
+            base.OnCollisionEnter(collision);
 
-            }
+            GameEventManager.Instance.InvokeHpChanged(this, player.PlayerStats.Hp);
         }
 
         private void Update()
         {
-            if (isMainPlayer)
-            {
-                HandleMovement();
-                HandleShooting();
-            }
+            HandleMovement();
+            HandleShooting();
         }
 
         private void HandleShooting()
         {
-            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.R))
-            {
-                var shootPosition = bulletInitialPosition.position;
+            if (!Input.GetMouseButtonDown(0) && !Input.GetKeyDown(KeyCode.R)) return;
+            
+            var shootPosition = bulletInitialPosition.position;
 
-                var bullet = Instantiate(bulletPrefab, shootPosition, Quaternion.identity);
-                var bulletRb = bullet.GetComponent<Rigidbody>();
-
-                var velocity = transform.forward * bulletSpeed * Time.deltaTime;
-                bulletRb.velocity = velocity;
-
-                gameManager.PlayerShoot(velocity, shootPosition);
-            }
-        }
-
-        public void CreateBullet(Position shootPosition, Position shootVector)
-        {
-            var bullet = Instantiate(
-                bulletPrefab,
-                new Vector3(shootPosition.X, shootPosition.Y, shootPosition.Z),
-                Quaternion.identity);
+            var bullet = InstantiateBullet(
+                shootPosition, 
+                player, 
+                Guid.NewGuid().ToString());
 
             var bulletRb = bullet.GetComponent<Rigidbody>();
-            bulletRb.velocity = new Vector3(shootVector.X, shootVector.Y, shootVector.Z);
-        }
 
+            var velocity = transform.forward * (bulletSpeed * Time.deltaTime);
+            bulletRb.velocity = velocity;
+
+            GameManager.Instance.PlayerShoot(velocity, shootPosition);
+        }
+        
         private void HandleMovement()
         {
-
             if (Input.anyKey)
             {
                 // left
                 if (Input.GetKey(KeyCode.A))
                 {
-                    var newPosition = _rigidbody.position +
+                    var newPosition = Rigidbody.position +
                                       transform.TransformDirection(-moveSpeed * Time.deltaTime, 0, 0);
-                    _rigidbody.MovePosition(newPosition);
+                    Rigidbody.MovePosition(newPosition);
                 }
 
                 // right
                 if (Input.GetKey(KeyCode.D))
                 {
-                    var newPosition = _rigidbody.position +
+                    var newPosition = Rigidbody.position +
                                       transform.TransformDirection(moveSpeed * Time.deltaTime, 0, 0);
-                    _rigidbody.MovePosition(newPosition);
+                    Rigidbody.MovePosition(newPosition);
                 }
 
                 // up
                 if (Input.GetKey(KeyCode.W))
                 {
-                    var newPosition = _rigidbody.position +
+                    var newPosition = Rigidbody.position +
                                       transform.TransformDirection(0, 0, moveSpeed * Time.deltaTime);
-                    _rigidbody.MovePosition(newPosition);
+                    Rigidbody.MovePosition(newPosition);
                 }
 
                 // down
                 if (Input.GetKey(KeyCode.S))
                 {
-                    var newPosition = _rigidbody.position +
+                    var newPosition = Rigidbody.position +
                                       transform.TransformDirection(0, 0, -moveSpeed * Time.deltaTime);
-                    _rigidbody.MovePosition(newPosition);
+                    Rigidbody.MovePosition(newPosition);
                 }
 
                 if (Input.GetKey(KeyCode.Space))
                 {
-                    var newPosition = _rigidbody.position + transform.TransformDirection(0, Time.deltaTime * 10, 0);
-                    _rigidbody.MovePosition(newPosition);
+                    var newPosition = Rigidbody.position + transform.TransformDirection(0, Time.deltaTime * 10, 0);
+                    Rigidbody.MovePosition(newPosition);
                 }
 
                 if (Input.GetKey(KeyCode.Q))
@@ -122,8 +97,8 @@ namespace Controllers
                 {
                     transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
                 }
-                
-                gameManager.SyncPlayerState(gameObject);
+
+                GameManager.Instance.SyncPlayerState(gameObject);
             }
         }
     }

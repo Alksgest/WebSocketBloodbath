@@ -1,12 +1,11 @@
-﻿using System;
-using Constants;
+﻿using Constants;
 using Managers;
 using Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Controllers
+namespace Controllers.UI
 {
     public class MainUIController : MonoBehaviour
     {
@@ -40,6 +39,7 @@ namespace Controllers
 
         public void StartGame()
         {
+            mainMenu.SetActive(false);
             SceneManager.LoadScene(SceneNumber.SandBox);
         }
 

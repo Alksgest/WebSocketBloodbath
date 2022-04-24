@@ -1,12 +1,20 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace Managers
 {
+    public class GameEventArgs<T> : EventArgs
+    {
+        public object Sender { get; set; }
+        public T Value { get; set; }
+    }
+    
     public class GameEventManager: MonoBehaviour
     {
         public static GameEventManager Instance;
         
-        // public UnityEvent<GameEventArgs<IVisitable>> shipLanded = new();
+        public UnityEvent<GameEventArgs<int>> hpChanged = new();
         
         private void Awake()
         {
@@ -14,13 +22,13 @@ namespace Managers
             DontDestroyOnLoad(gameObject);
         }
         
-        // public void InvokeShipLanded(object sender, IVisitable target)
-        // {
-        //     shipLanded.Invoke(new GameEventArgs<IVisitable>
-        //     {
-        //         Sender = sender,
-        //         Value = target
-        //     });
-        // }
+        public void InvokeHpChanged(object sender, int value)
+        {
+            hpChanged.Invoke(new GameEventArgs<int>
+            {
+                Sender = sender,
+                Value = value
+            });
+        }
     }
 }

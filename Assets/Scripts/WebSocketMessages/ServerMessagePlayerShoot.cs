@@ -8,5 +8,6 @@ namespace WebSocketMessages
     {
         public Position ShootVector { get; set; }
         public Position ShootPosition { get; set; }
+        public string BulletId { get; set; }
     }
 }
