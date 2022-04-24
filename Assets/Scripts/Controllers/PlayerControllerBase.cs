@@ -24,7 +24,6 @@ namespace Controllers
                 Hp = 100
             };
             
-            
             player = p;
         }
         
@@ -32,8 +31,7 @@ namespace Controllers
         {
             Rigidbody = GetComponent<Rigidbody>();
         }
-
-       
+        
         protected  virtual void OnCollisionEnter(Collision collision)
         {
             var res = collision.gameObject.TryGetComponent<BulletController>(out var bullet);

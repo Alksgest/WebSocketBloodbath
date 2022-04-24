@@ -62,6 +62,11 @@ namespace Managers
 
         private void OnDestroy()
         {
+            CloseSession();
+        }
+
+        public void CloseSession()
+        {
             _ws.Close(CloseStatusCode.Normal);
         }
 

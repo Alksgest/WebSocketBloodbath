@@ -37,6 +37,15 @@ namespace Controllers.UI
             }
         }
 
+        public void ToMainMenu()
+        {
+            if (SceneManager.GetActiveScene().buildIndex != SceneNumber.MainMenuScene)
+            {
+                GameManager.Instance.CloseSession();
+                SceneManager.LoadScene(SceneNumber.MainMenuScene);
+            }
+        }
+
         public void StartGame()
         {
             mainMenu.SetActive(false);
