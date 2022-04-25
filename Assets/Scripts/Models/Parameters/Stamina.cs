@@ -11,7 +11,7 @@ namespace Models.Parameters
             maxValue = 100;
             minValue = 0;
             consumptionRate = 10f;
-            recoveryRate = 10f;
+            recoveryRate = 2f;
         }
     }
 }

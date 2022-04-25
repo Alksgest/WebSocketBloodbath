@@ -19,13 +19,14 @@ namespace Controllers
 
         public void ReduceStamina(float value)
         {
-            if(player.PlayerStats.Stamina.Value == 0) return;
+            var stamina = player.PlayerStats.Stamina;
+            if(stamina.Value == stamina.MinValue) return;
 
-            player.PlayerStats.Stamina.Value -= value;
+            stamina.Value -= value;
 
-            if (player.PlayerStats.Stamina.Value < 0)
+            if (stamina.Value <= stamina.MinValue)
             {
-                player.PlayerStats.Stamina.Value = 0;
+                stamina.Value = 0;
             }
             
             GameEventManager.Instance.InvokePlayerStatsChanged(this, player.PlayerStats);
@@ -33,7 +34,18 @@ namespace Controllers
 
         public void IncreaseStamina(float value)
         {
+            var stamina = player.PlayerStats.Stamina;
             
+            if(stamina.Value == stamina.MaxValue) return;
+
+            stamina.Value += value;
+
+            if (stamina.Value >= stamina.MaxValue)
+            {
+                stamina.Value = stamina.MaxValue;
+            }
+            
+            GameEventManager.Instance.InvokePlayerStatsChanged(this, player.PlayerStats);
         }
         
         private void OnCollisionEnter(Collision collision)

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using Controllers.AnimationStates;
 using Controllers.UI;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Controllers
     public class PlayerMovementController : MonoBehaviour
     {
         [SerializeField] private float rotationSpeed = 200f;
-        
+
         [SerializeField] private Animator animator;
         [SerializeField] private PlayerStatsController playerStatsController;
 
@@ -25,13 +26,14 @@ namespace Controllers
             _control.Player.Mouse.started += HandleFightActionStarted;
             _control.Player.Mouse.canceled += HandleFightActionCanceled;
         }
-        
+
         private void HandleFightActionStarted(InputAction.CallbackContext context)
         {
             if (MainUIController.Instance.IsUIBlocking)
             {
                 return;
             }
+
             SetAttackAnimation(AttackAnimationState.Attack);
             // StartCoroutine(FinishAttackAnimation());
         }
@@ -42,10 +44,10 @@ namespace Controllers
             {
                 yield return null;
             }
-            
+
             SetAttackAnimation(AttackAnimationState.NoAction);
         }
-        
+
         private void HandleFightActionCanceled(InputAction.CallbackContext context)
         {
             SetAttackAnimation(AttackAnimationState.NoAction);
@@ -60,19 +62,36 @@ namespace Controllers
         {
             _control.Disable();
         }
-        
-                private void Update()
+
+        private void Update()
         {
+            HandleStaminaChanges();
+            
             if (MainUIController.Instance.IsUIBlocking)
             {
                 return;
             }
-            
+
             HandleMovement();
             HandleRotation();
         }
-        
 
+        private void HandleStaminaChanges()
+        {
+            var moveState = (MoveAnimationState)animator.GetInteger(Move);
+            switch (moveState)
+            {
+                case MoveAnimationState.Run: 
+                case MoveAnimationState.RunForwardLeft: 
+                case MoveAnimationState.RunForwardRight:
+                    ReduceStamina();
+                    break;
+                case MoveAnimationState.NoAction:
+                    IncreaseStamina();
+                    break;
+            }
+        }
+        
         private void HandleRotation()
         {
             var rotationDirection = _control.Player.Rotate.ReadValue<float>();
@@ -116,12 +135,18 @@ namespace Controllers
                 {y: < 0} => SetMoveAnimation(MoveAnimationState.MoveBackward),
                 _ => SetMoveAnimation(MoveAnimationState.NoAction)
             };
-            
-            if (shiftW > 0)
-            {
-                playerStatsController.ReduceStamina(Time.deltaTime *
-                                               playerStatsController.Player.PlayerStats.Stamina.ConsumptionRate);
-            }
+        }
+
+        private void IncreaseStamina()
+        {
+            playerStatsController.IncreaseStamina(Time.deltaTime *
+                                                playerStatsController.Player.PlayerStats.Stamina.RecoveryRate);
+        }
+
+        private void ReduceStamina()
+        {
+            playerStatsController.ReduceStamina(Time.deltaTime *
+                                                playerStatsController.Player.PlayerStats.Stamina.ConsumptionRate);
         }
 
         private bool SetJumpAnimation(bool state)
@@ -130,17 +155,17 @@ namespace Controllers
 
             return true;
         }
-        
+
         private bool SetAttackAnimation(AttackAnimationState state)
         {
-            animator.SetInteger(Attack, (int)state);
+            animator.SetInteger(Attack, (int) state);
 
             return true;
         }
 
         private bool SetMoveAnimation(MoveAnimationState state)
         {
-            animator.SetInteger(Move, (int)state);
+            animator.SetInteger(Move, (int) state);
 
             return true;
         }
