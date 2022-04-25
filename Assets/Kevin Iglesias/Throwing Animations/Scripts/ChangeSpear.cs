@@ -5,10 +5,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace KevinIglesias {
+namespace Kevin_Iglesias.Throwing_Animations.Scripts {
     
     public class ChangeSpear : MonoBehaviour {
 

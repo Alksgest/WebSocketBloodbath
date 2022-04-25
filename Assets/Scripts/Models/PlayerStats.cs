@@ -1,4 +1,5 @@
 ﻿using System;
+using Models.Parameters;
 using UnityEngine;
 
 namespace Models
@@ -6,19 +7,16 @@ namespace Models
     [Serializable]
     public class PlayerStats
     {
-        [SerializeField] private int hp;
-        [SerializeField] private int hits;
+        [SerializeField] private Hp hp;
+        [SerializeField] private Stamina stamina;
 
-        public int Hp
-        {
-            get => hp;
-            set => hp = value;
-        }
+        public Hp Hp => hp;
+        public Stamina Stamina => stamina;
 
-        public int Hits
+        public PlayerStats()
         {
-            get => hits;
-            set => hits = value;
+            hp = new Hp();
+            stamina = new Stamina();
         }
     }
 }

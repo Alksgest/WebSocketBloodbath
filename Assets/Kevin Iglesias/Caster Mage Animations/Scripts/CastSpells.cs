@@ -1,9 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace KevinIglesias{
+namespace Kevin_Iglesias.Caster_Mage_Animations.Scripts{
 
     public enum CastHand {RightHand, LeftHand}
     

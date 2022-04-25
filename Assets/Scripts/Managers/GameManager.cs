@@ -22,8 +22,8 @@ namespace Managers
         private Player _mainPlayerModel;
         private GameObject _mainPlayerGo;
 
-        private readonly IDictionary<string, PlayerControllerBase> _playerIdToPlayer =
-            new Dictionary<string, PlayerControllerBase>();
+        private readonly IDictionary<string, PlayerStatsController> _playerIdToPlayer =
+            new Dictionary<string, PlayerStatsController>();
 
         private readonly Queue<string> _gameServerMessageQueue = new();
 
@@ -47,7 +47,7 @@ namespace Managers
             };
 
             // InitWebSocketClient();
-            // InitMainPlayer();
+            InitMainPlayer();
         }
 
         private void Update()
@@ -107,7 +107,7 @@ namespace Managers
         {
             var playerPos = new Vector3(0, 1, 0);
             _mainPlayerGo = Instantiate(playerPrefab, playerPos, Quaternion.identity);
-            var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerController>();
+            var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerStatsController>();
 
             var uuid = Guid.NewGuid().ToString();
             
@@ -117,11 +117,7 @@ namespace Managers
                 Id = uuid,
                 Position = playerTransform.position,
                 Rotation = playerTransform.rotation,
-                PlayerStats = new PlayerStats
-                {
-                    Hits = 0,
-                    Hp = 100
-                }
+                PlayerStats = new PlayerStats()
             };
             
             mainPlayerScript.Init(_mainPlayerModel);
@@ -240,7 +236,7 @@ namespace Managers
                 Quaternion.identity
             );
 
-            var playerController = otherPlayerGo.GetComponent<PlayerControllerBase>();
+            var playerController = otherPlayerGo.GetComponent<PlayerStatsController>();
             
             playerController.Init(otherPlayerModel);
 

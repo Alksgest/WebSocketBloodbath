@@ -1,4 +1,6 @@
-﻿using Managers;
+﻿using System.Globalization;
+using Managers;
+using Models;
 using TMPro;
 using UnityEngine;
 
@@ -7,15 +9,17 @@ namespace Controllers.UI
     public class PlayerUIController : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI hpValue;
+        [SerializeField] private TextMeshProUGUI staminaValue;
         private void Start()
         {
-            GameEventManager.Instance.hpChanged.AddListener(OnHpChanged);
+            GameEventManager.Instance.playerStatsChanged.AddListener(OnPlayerStatsChanged);
             DontDestroyOnLoad(gameObject);
         }
 
-        private void OnHpChanged(GameEventArgs<int> args)
+        private void OnPlayerStatsChanged(GameEventArgs<PlayerStats> args)
         {
-            hpValue.text = args.Value.ToString();
+            hpValue.text = ((int)args.Value.Hp.Value).ToString();
+            staminaValue.text = ((int)args.Value.Stamina.Value).ToString();
         }
     }
 }

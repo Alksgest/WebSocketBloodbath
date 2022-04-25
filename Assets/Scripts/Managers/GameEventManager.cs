@@ -1,4 +1,5 @@
 ﻿using System;
+using Models;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,7 +15,7 @@ namespace Managers
     {
         public static GameEventManager Instance;
         
-        public UnityEvent<GameEventArgs<int>> hpChanged = new();
+        public UnityEvent<GameEventArgs<PlayerStats>> playerStatsChanged = new();
         
         private void Awake()
         {
@@ -22,13 +23,14 @@ namespace Managers
             DontDestroyOnLoad(gameObject);
         }
         
-        public void InvokeHpChanged(object sender, int value)
+        public void InvokePlayerStatsChanged(object sender, PlayerStats value)
         {
-            hpChanged.Invoke(new GameEventArgs<int>
+            playerStatsChanged.Invoke(new GameEventArgs<PlayerStats>
             {
                 Sender = sender,
                 Value = value
             });
         }
+        
     }
 }
