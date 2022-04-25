@@ -7,11 +7,11 @@ namespace Models.Parameters
     {
         public Stamina()
         {
-            value = 100;
-            maxValue = 100;
-            minValue = 0;
-            consumptionRate = 10f;
-            recoveryRate = 2f;
+            Value = 100;
+            MaxValue = 100;
+            MinValue = 0;
+            ConsumptionRate = 10f;
+            RecoveryRate = 5f;
         }
     }
 }

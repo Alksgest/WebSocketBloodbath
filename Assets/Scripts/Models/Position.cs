@@ -6,27 +6,9 @@ namespace Models
     [Serializable]
     public class Position
     {
-        [SerializeField] private float x;
-        [SerializeField] private float y;
-        [SerializeField] private float z;
-
-        public float X
-        {
-            get => x;
-            set => x = value;
-        }
-
-        public float Y
-        {
-            get => y;
-            set => y = value;
-        }
-
-        public float Z
-        {
-            get => z;
-            set => z = value;
-        }
+        [field: SerializeField] public float X { get; set; }
+        [field: SerializeField] public float Y { get; set; }
+        [field: SerializeField] public float Z { get; set; }
 
         public static implicit operator Position(Vector3 vec)
         {

@@ -6,19 +6,7 @@ namespace Models
     [Serializable]
     public class Bullet
     {
-        [SerializeField] private string id;
-        [SerializeField] private string playerId;
-
-        public string Id
-        {
-            get => id;
-            set => id = value;
-        }
-
-        public string PlayerId
-        {
-            get => playerId;
-            set => playerId = value;
-        }
+        [field: SerializeField] public string Id { get; }
+        [field: SerializeField] public string PlayerId { get; }
     }
 }

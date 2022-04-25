@@ -7,16 +7,13 @@ namespace Models
     [Serializable]
     public class PlayerStats
     {
-        [SerializeField] private Hp hp;
-        [SerializeField] private Stamina stamina;
-
-        public Hp Hp => hp;
-        public Stamina Stamina => stamina;
+        [field: SerializeField] public Hp Hp { get; }
+        [field: SerializeField] public Stamina Stamina { get; }
 
         public PlayerStats()
         {
-            hp = new Hp();
-            stamina = new Stamina();
+            Hp = new Hp();
+            Stamina = new Stamina();
         }
     }
 }

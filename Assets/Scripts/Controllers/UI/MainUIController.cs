@@ -16,6 +16,7 @@ namespace Controllers.UI
         
         [SerializeField] private GameObject mainMenu;
         [SerializeField] private GameObject optionsMenu;
+        [SerializeField] private GameObject inventory;
         
         [SerializeField] private TMP_InputField nameInput;
         [SerializeField] private TMP_InputField urlInput;
@@ -26,11 +27,17 @@ namespace Controllers.UI
         {
             Instance = this;
             _uiActions = new UIInputActions();
-            _uiActions.Player.Menu.started += EscapePressed;
+            _uiActions.Player.Menu.started += OpenMenu;
+            _uiActions.Player.Inventory.started += OpenInventory;
             DontDestroyOnLoad(gameObject);
         }
 
-        private void EscapePressed(InputAction.CallbackContext obj)
+        private void OpenInventory(InputAction.CallbackContext obj)
+        {
+            inventory.SetActive(!inventory.activeSelf);
+        }
+
+        private void OpenMenu(InputAction.CallbackContext obj)
         {
             if (optionsMenu.activeSelf)
             {
@@ -63,11 +70,7 @@ namespace Controllers.UI
             nameInput.text = settings.Username;
             urlInput.text = settings.ServerUrl;
         }
-
-        private void Update()
-        {
-        }
-
+        
         public void ToMainMenu()
         {
             if (SceneManager.GetActiveScene().buildIndex != SceneNumber.MainMenuScene)

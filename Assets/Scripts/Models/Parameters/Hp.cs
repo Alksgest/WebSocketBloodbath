@@ -7,11 +7,11 @@ namespace Models.Parameters
     {
         public Hp()
         {
-            value = 100;
-            maxValue = 100;
-            minValue = 0;
-            consumptionRate = 0;
-            recoveryRate = 1f;
+            Value = 100;
+            MaxValue = 100;
+            MinValue = 0;
+            ConsumptionRate = 0;
+            RecoveryRate = 1f;
         }
     }
 }
