@@ -17,9 +17,7 @@ namespace Managers
         [SerializeField] private GameObject playerPrefab;
         [SerializeField] private GameObject otherPlayerPrefab;
 
-        private WebSocket _ws;
-
-        private const string DefaultGameServerUrl = "ws://0.tcp.eu.ngrok.io:14522";
+        // private WebSocket _ws;
 
         private Player _mainPlayerModel;
         private GameObject _mainPlayerGo;
@@ -45,18 +43,18 @@ namespace Managers
                 {ServerMessageType.PlayerExit, HandlePlayerExitServerMessage},
                 {ServerMessageType.PlayerUpdate, HandlePlayerUpdateServerMessage},
                 {ServerMessageType.GameState, HandleGameStateServerMessage},
-                {ServerMessageType.PlayerShoot, HandlePlayerShootMessage}
+                // {ServerMessageType.PlayerShoot, HandlePlayerShootMessage}
             };
 
-            InitWebSocketClient();
-            InitMainPlayer();
+            // InitWebSocketClient();
+            // InitMainPlayer();
         }
 
         private void Update()
         {
             while (_gameServerMessageQueue.Count > 0)
             {
-                HandleServerMessage(_gameServerMessageQueue.Dequeue());
+                // HandleServerMessage(_gameServerMessageQueue.Dequeue());
             }
         }
 
@@ -67,7 +65,7 @@ namespace Managers
 
         public void CloseSession()
         {
-            _ws.Close(CloseStatusCode.Normal);
+            // _ws.Close(CloseStatusCode.Normal);
         }
 
         public void SyncPlayerState(GameObject playerGo)
@@ -80,7 +78,7 @@ namespace Managers
             };
 
             var json = JsonConvert.SerializeObject(playerUpdateMessage);
-            _ws.Send(json);
+            // _ws.Send(json);
         }
 
         public void PlayerShoot(Position shootVector, Position shootPosition)
@@ -93,16 +91,16 @@ namespace Managers
             };
 
             var json = JsonConvert.SerializeObject(playerShootMessage);
-            _ws.Send(json);
+            // _ws.Send(json);
         }
 
         private void InitWebSocketClient()
         {
             var storedUrl = SettingsManager.GameSettings.ServerUrl;
-            var url = string.IsNullOrEmpty(storedUrl) ? DefaultGameServerUrl : storedUrl;
-            _ws = new WebSocket(url);
-            _ws.Connect();
-            _ws.OnMessage += QueueServerMessage;
+            // var url = string.IsNullOrEmpty(storedUrl) ? DefaultGameServerUrl : storedUrl;
+            // _ws = new WebSocket(url);
+            // _ws.Connect();
+            // _ws.OnMessage += QueueServerMessage;
         }
 
         private void InitMainPlayer()
@@ -134,7 +132,7 @@ namespace Managers
             };
 
             var json = JsonConvert.SerializeObject(playerEnterMessage);
-            _ws.Send(json);
+            // _ws.Send(json);
         }
 
         private void QueueServerMessage(object sender, MessageEventArgs e)
@@ -202,20 +200,20 @@ namespace Managers
         }
 
 
-        private void HandlePlayerShootMessage(string messageJson)
-        {
-            var gameStateMessage = JsonConvert.DeserializeObject<ServerMessagePlayerShoot>(messageJson);
-
-            if (gameStateMessage == null) return;
-
-            if (!_playerIdToPlayer.ContainsKey(gameStateMessage.Player.Id)) return;
-
-            var player = _playerIdToPlayer[gameStateMessage.Player.Id];
-
-            if (player is PlayerController) return;
-
-            player.CreateBullet(gameStateMessage);
-        }
+        // private void HandlePlayerShootMessage(string messageJson)
+        // {
+        //     var gameStateMessage = JsonConvert.DeserializeObject<ServerMessagePlayerShoot>(messageJson);
+        //
+        //     if (gameStateMessage == null) return;
+        //
+        //     if (!_playerIdToPlayer.ContainsKey(gameStateMessage.Player.Id)) return;
+        //
+        //     var player = _playerIdToPlayer[gameStateMessage.Player.Id];
+        //
+        //     if (player is PlayerController) return;
+        //
+        //     player.CreateBullet(gameStateMessage);
+        // }
 
         private void HandleGameStateServerMessage(string messageJson)
         {

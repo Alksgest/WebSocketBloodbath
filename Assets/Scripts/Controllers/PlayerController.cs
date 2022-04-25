@@ -1,105 +1,151 @@
-using System;
-using Managers;
-using Models;
+using System.Collections;
+using Controllers.UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Controllers
 {
+    public enum AttackAnimationState
+    {
+        NoAction = 0,
+        Attack = 1, // TODO: change name 
+    }
+
+    public enum MoveAnimationState
+    {
+        NoAction = 0,
+        Move = 1,
+        Run = 2,
+        MoveLeft = 3,
+        MoveRight = 4,
+        MoveForwardLeft = 5,
+        MoveForwardRight = 6,
+        RunForwardLeft = 7,
+        RunForwardRight = 8,
+        MoveBackward = -1,
+        RunBackward = -2,
+        MoveBackwardLeft = -3,
+        MoveBackwardRight = -4,
+    }
+
     public class PlayerController : PlayerControllerBase
     {
-        public override void Init(Player p)
+        private PlayerControlInputActions _control;
+
+        private void Awake()
         {
-            base.Init(p);
+            _control = new PlayerControlInputActions();
+            _control.Player.Mouse.started += HandleFightActionStarted;
+            _control.Player.Mouse.canceled += HandleFightActionCanceled;
+        }
+
+        private void HandleFightActionStarted(InputAction.CallbackContext context)
+        {
+            if (MainUIController.Instance.IsUIBlocking)
+            {
+                return;
+            }
+            SetAttackAnimation(AttackAnimationState.Attack);
+            // StartCoroutine(FinishAttackAnimation());
+        }
+
+        private IEnumerator FinishAttackAnimation()
+        {
+            while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+            {
+                yield return null;
+            }
             
-            GameEventManager.Instance.InvokeHpChanged(this, player.PlayerStats.Hp);
-        }
-
-        protected override void OnCollisionEnter(Collision collision)
-        {
-            base.OnCollisionEnter(collision);
-
-            GameEventManager.Instance.InvokeHpChanged(this, player.PlayerStats.Hp);
-        }
-
-        private void Update()
-        {
-            HandleMovement();
-            HandleShooting();
-        }
-
-        private void HandleShooting()
-        {
-            if (!Input.GetMouseButtonDown(0) && !Input.GetKeyDown(KeyCode.R)) return;
-            
-            var shootPosition = bulletInitialPosition.position;
-
-            var bullet = InstantiateBullet(
-                shootPosition, 
-                player, 
-                Guid.NewGuid().ToString());
-
-            var bulletRb = bullet.GetComponent<Rigidbody>();
-
-            var velocity = transform.forward * (bulletSpeed * Time.deltaTime);
-            bulletRb.velocity = velocity;
-
-            GameManager.Instance.PlayerShoot(velocity, shootPosition);
+            SetAttackAnimation(AttackAnimationState.NoAction);
         }
         
+        private void HandleFightActionCanceled(InputAction.CallbackContext context)
+        {
+            SetAttackAnimation(AttackAnimationState.NoAction);
+        }
+
+        private void OnEnable()
+        {
+            _control.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _control.Disable();
+        }
+        
+        private void Update()
+        {
+            if (MainUIController.Instance.IsUIBlocking)
+            {
+                return;
+            }
+            
+            HandleMovement();
+            HandleRotation();
+        }
+        
+
+        private void HandleRotation()
+        {
+            var rotationDirection = _control.Player.Rotate.ReadValue<float>();
+
+            switch (rotationDirection)
+            {
+                case -1:
+                    transform.Rotate(new Vector3(0, -rotationSpeed * Time.deltaTime, 0));
+                    break;
+                case 1:
+                    transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
+                    break;
+            }
+        }
+
         private void HandleMovement()
         {
-            if (Input.anyKey)
+            var direction = _control.Player.Move.ReadValue<Vector2>();
+            var shiftW = (int) Mathf.Round(_control.Player.Run.ReadValue<float>());
+            var wA = _control.Player.MoveForwardLeft.ReadValue<float>();
+            var wD = _control.Player.MoveForwardRight.ReadValue<float>();
+            var sA = _control.Player.MoveBackwardLeft.ReadValue<float>();
+            var sD =_control.Player.MoveBackwardRight.ReadValue<float>();
+            
+            _ = direction switch
             {
-                // left
-                if (Input.GetKey(KeyCode.A))
-                {
-                    var newPosition = Rigidbody.position +
-                                      transform.TransformDirection(-moveSpeed * Time.deltaTime, 0, 0);
-                    Rigidbody.MovePosition(newPosition);
-                }
+                {x: < 0, y: 0} => SetMoveAnimation(MoveAnimationState.MoveLeft),
+                {x: > 0, y: 0} => SetMoveAnimation(MoveAnimationState.MoveRight),
+                {y: > 0} when wA > 0 && shiftW > 0 => SetMoveAnimation(MoveAnimationState.RunForwardLeft),
+                {y: > 0} when wD > 0 && shiftW > 0 => SetMoveAnimation(MoveAnimationState.RunForwardRight),
+                {y: > 0} when wA > 0 => SetMoveAnimation(MoveAnimationState.MoveForwardLeft),
+                {y: > 0} when wD > 0 => SetMoveAnimation(MoveAnimationState.MoveForwardRight),
+                {y: > 0} when shiftW > 0 => SetMoveAnimation(MoveAnimationState.Run),
+                {y: > 0} => SetMoveAnimation(MoveAnimationState.Move),
+                {y: < 0} when sA > 0 => SetMoveAnimation(MoveAnimationState.MoveBackwardLeft),
+                {y: < 0} when sD > 0 => SetMoveAnimation(MoveAnimationState.MoveBackwardRight),
+                {y: < 0} => SetMoveAnimation(MoveAnimationState.MoveBackward),
+                _ => SetMoveAnimation(MoveAnimationState.NoAction)
+            };
+        }
 
-                // right
-                if (Input.GetKey(KeyCode.D))
-                {
-                    var newPosition = Rigidbody.position +
-                                      transform.TransformDirection(moveSpeed * Time.deltaTime, 0, 0);
-                    Rigidbody.MovePosition(newPosition);
-                }
+        private bool SetJumpAnimation(bool state)
+        {
+            animator.SetBool(Jump, state);
 
-                // up
-                if (Input.GetKey(KeyCode.W))
-                {
-                    var newPosition = Rigidbody.position +
-                                      transform.TransformDirection(0, 0, moveSpeed * Time.deltaTime);
-                    Rigidbody.MovePosition(newPosition);
-                }
+            return true;
+        }
+        
+        private bool SetAttackAnimation(AttackAnimationState state)
+        {
+            animator.SetInteger(Attack, (int)state);
 
-                // down
-                if (Input.GetKey(KeyCode.S))
-                {
-                    var newPosition = Rigidbody.position +
-                                      transform.TransformDirection(0, 0, -moveSpeed * Time.deltaTime);
-                    Rigidbody.MovePosition(newPosition);
-                }
+            return true;
+        }
 
-                if (Input.GetKey(KeyCode.Space))
-                {
-                    var newPosition = Rigidbody.position + transform.TransformDirection(0, Time.deltaTime * 10, 0);
-                    Rigidbody.MovePosition(newPosition);
-                }
+        private bool SetMoveAnimation(MoveAnimationState state)
+        {
+            animator.SetInteger(Move, (int)state);
 
-                if (Input.GetKey(KeyCode.Q))
-                {
-                    transform.Rotate(new Vector3(0, -rotationSpeed * Time.deltaTime, 0));
-                }
-
-                if (Input.GetKey(KeyCode.E))
-                {
-                    transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
-                }
-
-                GameManager.Instance.SyncPlayerState(gameObject);
-            }
+            return true;
         }
     }
 }

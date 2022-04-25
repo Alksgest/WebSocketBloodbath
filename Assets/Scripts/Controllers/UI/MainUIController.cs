@@ -3,23 +3,59 @@ using Managers;
 using Models;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace Controllers.UI
 {
     public class MainUIController : MonoBehaviour
     {
+        public static MainUIController Instance;
+
+        public bool IsUIBlocking => mainMenu.activeSelf || optionsMenu.activeSelf;
+        
         [SerializeField] private GameObject mainMenu;
         [SerializeField] private GameObject optionsMenu;
         
         [SerializeField] private TMP_InputField nameInput;
         [SerializeField] private TMP_InputField urlInput;
+
+        private UIInputActions _uiActions;
         
         private void Awake()
         {
+            Instance = this;
+            _uiActions = new UIInputActions();
+            _uiActions.Player.Menu.started += EscapePressed;
             DontDestroyOnLoad(gameObject);
         }
-        
+
+        private void EscapePressed(InputAction.CallbackContext obj)
+        {
+            if (optionsMenu.activeSelf)
+            {
+                mainMenu.SetActive(true);
+                optionsMenu.SetActive(false);
+                return;
+            }
+
+            if (SceneManager.GetActiveScene().buildIndex != SceneNumber.MainMenuScene)
+            {
+                mainMenu.SetActive(!mainMenu.activeSelf);
+            }
+        }
+
+        private void OnEnable()
+        {
+            _uiActions.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _uiActions.Disable();
+        }
+
+
         private void Start()
         {
             var settings = SettingsManager.GameSettings;
@@ -30,11 +66,6 @@ namespace Controllers.UI
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) &&
-                SceneManager.GetActiveScene().buildIndex != SceneNumber.MainMenuScene)
-            {
-                mainMenu.SetActive(!mainMenu.activeSelf);
-            }
         }
 
         public void ToMainMenu()

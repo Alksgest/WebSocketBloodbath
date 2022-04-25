@@ -299,7 +299,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &9002724856089716698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,8 +312,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c9d63ecad181454ea293d5d21a000dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMainPlayer: 0
-  sceneManager: {fileID: 0}
+  player:
+    id: 
+    playerStats:
+      hp: 0
+      hits: 0
+    position:
+      x: 0
+      y: 0
+      z: 0
+    rotation:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
   moveSpeed: 10
   rotationSpeed: 200
   bulletSpeed: 5000
