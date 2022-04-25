@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Constants;
 using Controllers;
 using Models;
+using Models.Player;
 using Newtonsoft.Json;
+using Repositories;
 using UnityEngine;
 using WebSocketMessages;
 using WebSocketSharp;
@@ -22,8 +24,8 @@ namespace Managers
         private Player _mainPlayerModel;
         private GameObject _mainPlayerGo;
 
-        private readonly IDictionary<string, PlayerStatsController> _playerIdToPlayer =
-            new Dictionary<string, PlayerStatsController>();
+        private readonly IDictionary<Guid, PlayerStatsController> _playerIdToPlayer =
+            new Dictionary<Guid, PlayerStatsController>();
 
         private readonly Queue<string> _gameServerMessageQueue = new();
 
@@ -108,17 +110,8 @@ namespace Managers
             var playerPos = new Vector3(0, 1, 0);
             _mainPlayerGo = Instantiate(playerPrefab, playerPos, Quaternion.identity);
             var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerStatsController>();
-
-            var uuid = Guid.NewGuid().ToString();
             
-            var playerTransform = transform;
-            _mainPlayerModel = new Player
-            {
-                Id = uuid,
-                Position = playerTransform.position,
-                Rotation = playerTransform.rotation,
-                PlayerStats = new PlayerStats()
-            };
+            _mainPlayerModel = CharacterRepository.GetCharacter();
             
             mainPlayerScript.Init(_mainPlayerModel);
 

@@ -1,5 +1,6 @@
 using Managers;
 using Models;
+using Models.Player;
 using UnityEngine;
 
 namespace Controllers

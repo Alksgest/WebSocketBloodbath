@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Managers;
 using Models;
+using Models.Player;
 using TMPro;
 using UnityEngine;
 

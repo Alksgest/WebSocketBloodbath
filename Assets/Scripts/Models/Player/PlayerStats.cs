@@ -2,7 +2,7 @@
 using Models.Parameters;
 using UnityEngine;
 
-namespace Models
+namespace Models.Player
 {
     [Serializable]
     public class PlayerStats

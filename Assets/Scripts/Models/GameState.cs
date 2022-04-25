@@ -7,6 +7,6 @@ namespace Models
     public class GameState
     {
         public List<string> ConnectionIds { get; set; }
-        public List<Player> Players { get; set; }
+        public List<Player.Player> Players { get; set; }
     }
 }
