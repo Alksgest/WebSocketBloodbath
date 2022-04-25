@@ -1,6 +1,6 @@
 using Managers;
-using Models;
 using Models.Player;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Controllers
@@ -9,7 +9,7 @@ namespace Controllers
     {
         public Player Player => player;
         
-        [SerializeField] private Player player;
+        [ShowInInspector, ReadOnly] private Player player;
         
         public void Init(Player p)
         {

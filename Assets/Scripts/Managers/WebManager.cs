@@ -5,24 +5,23 @@ using Controllers;
 using Models;
 using Models.Player;
 using Newtonsoft.Json;
-using Repositories;
 using UnityEngine;
 using WebSocketMessages;
 using WebSocketSharp;
 
 namespace Managers
 {
-    public class GameManager : MonoBehaviour
+    public class WebManager : MonoBehaviour
     {
-        public static GameManager Instance;
+        public static WebManager Instance;
         
         [SerializeField] private GameObject playerPrefab;
         [SerializeField] private GameObject otherPlayerPrefab;
 
         // private WebSocket _ws;
-
-        private Player _mainPlayerModel;
-        private GameObject _mainPlayerGo;
+        //
+        // private Player _mainPlayerModel;
+        // private GameObject _mainPlayerGo;
 
         private readonly IDictionary<Guid, PlayerStatsController> _playerIdToPlayer =
             new Dictionary<Guid, PlayerStatsController>();
@@ -49,7 +48,7 @@ namespace Managers
             };
 
             // InitWebSocketClient();
-            InitMainPlayer();
+            // InitMainPlayer();
         }
 
         private void Update()
@@ -72,28 +71,28 @@ namespace Managers
 
         public void SyncPlayerState(GameObject playerGo)
         {
-            _mainPlayerModel.Position = playerGo.transform.position;
-            _mainPlayerModel.Rotation = playerGo.transform.rotation;
-            var playerUpdateMessage = new ClientMessagePlayerUpdate
-            {
-                Player = _mainPlayerModel
-            };
-
-            var json = JsonConvert.SerializeObject(playerUpdateMessage);
-            // _ws.Send(json);
+            // _mainPlayerModel.Position = playerGo.transform.position;
+            // _mainPlayerModel.Rotation = playerGo.transform.rotation;
+            // var playerUpdateMessage = new ClientMessagePlayerUpdate
+            // {
+            //     Player = _mainPlayerModel
+            // };
+            //
+            // var json = JsonConvert.SerializeObject(playerUpdateMessage);
+            // // _ws.Send(json);
         }
 
         public void PlayerShoot(Position shootVector, Position shootPosition)
         {
-            var playerShootMessage = new ClientMessagePlayerShoot
-            {
-                Player = _mainPlayerModel,
-                ShootVector = shootVector,
-                ShootPosition = shootPosition
-            };
-
-            var json = JsonConvert.SerializeObject(playerShootMessage);
-            // _ws.Send(json);
+            // var playerShootMessage = new ClientMessagePlayerShoot
+            // {
+            //     Player = _mainPlayerModel,
+            //     ShootVector = shootVector,
+            //     ShootPosition = shootPosition
+            // };
+            //
+            // var json = JsonConvert.SerializeObject(playerShootMessage);
+            // // _ws.Send(json);
         }
 
         private void InitWebSocketClient()
@@ -105,25 +104,25 @@ namespace Managers
             // _ws.OnMessage += QueueServerMessage;
         }
 
-        private void InitMainPlayer()
-        {
-            var playerPos = new Vector3(0, 1, 0);
-            _mainPlayerGo = Instantiate(playerPrefab, playerPos, Quaternion.identity);
-            var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerStatsController>();
-            
-            _mainPlayerModel = CharacterRepository.GetCharacter();
-            
-            mainPlayerScript.Init(_mainPlayerModel);
-
-            var playerEnterMessage = new ClientMessagePlayerEnter
-            {
-                Player = _mainPlayerModel
-            };
-
-            var json = JsonConvert.SerializeObject(playerEnterMessage);
-            // _ws.Send(json);
-        }
-
+        // private void InitMainPlayer()
+        // {
+        //     var playerPos = new Vector3(0, 1, 0);
+        //     _mainPlayerGo = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        //     var mainPlayerScript = _mainPlayerGo.GetComponent<PlayerStatsController>();
+        //     
+        //     _mainPlayerModel = CharacterRepository.GetCharacter();
+        //     
+        //     mainPlayerScript.Init(_mainPlayerModel);
+        //
+        //     var playerEnterMessage = new ClientMessagePlayerEnter
+        //     {
+        //         Player = _mainPlayerModel
+        //     };
+        //
+        //     var json = JsonConvert.SerializeObject(playerEnterMessage);
+        //     // _ws.Send(json);
+        // }
+        
         private void QueueServerMessage(object sender, MessageEventArgs e)
         {
             Debug.Log("Server message received: " + e.Data);
@@ -220,20 +219,20 @@ namespace Managers
 
         private void AddOtherPlayer(Player otherPlayerModel)
         {
-            if (otherPlayerModel.Id == _mainPlayerModel.Id ||
-                _playerIdToPlayer.ContainsKey(otherPlayerModel.Id)) return;
-
-            var otherPlayerGo = Instantiate(
-                otherPlayerPrefab,
-                otherPlayerModel.Position,
-                Quaternion.identity
-            );
-
-            var playerController = otherPlayerGo.GetComponent<PlayerStatsController>();
-            
-            playerController.Init(otherPlayerModel);
-
-            _playerIdToPlayer.Add(otherPlayerModel.Id, playerController);
+            // if (otherPlayerModel.Id == _mainPlayerModel.Id ||
+            //     _playerIdToPlayer.ContainsKey(otherPlayerModel.Id)) return;
+            //
+            // var otherPlayerGo = Instantiate(
+            //     otherPlayerPrefab,
+            //     otherPlayerModel.Position,
+            //     Quaternion.identity
+            // );
+            //
+            // var playerController = otherPlayerGo.GetComponent<PlayerStatsController>();
+            //
+            // playerController.Init(otherPlayerModel);
+            //
+            // _playerIdToPlayer.Add(otherPlayerModel.Id, playerController);
         }
     }
 }

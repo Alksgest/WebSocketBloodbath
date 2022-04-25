@@ -75,7 +75,7 @@ namespace Controllers.UI
         {
             if (SceneManager.GetActiveScene().buildIndex != SceneNumber.MainMenuScene)
             {
-                GameManager.Instance.CloseSession();
+                WebManager.Instance.CloseSession();
                 SceneManager.LoadScene(SceneNumber.MainMenuScene);
             }
         }

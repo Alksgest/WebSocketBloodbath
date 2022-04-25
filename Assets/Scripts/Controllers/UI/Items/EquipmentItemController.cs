@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Managers;
 using Models.Items;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -53,21 +54,17 @@ namespace Controllers.UI.Items
                 var slot = hit.gameObject.GetComponent<EquipmentSlotController>();
 
                 if (slot == null) continue;
-                
-                if (slot.SlotFilled) continue;
 
-                currentSlot.Clear();
+                var itemMoved = InventoryManager.MoveItem(currentSlot, slot, this);
                 
-                // slot.AddItem(this);
-                currentSlot = slot;
-                currentSlot.currentItem = this;
+                if (!itemMoved) continue;
 
                 break;
             }
 
             ResetPosition();
         }
-
+        
         private void ResetPosition()
         {
             var thisTransform = transform;

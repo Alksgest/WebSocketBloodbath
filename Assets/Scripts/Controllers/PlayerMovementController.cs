@@ -4,6 +4,7 @@ using Controllers.AnimationStates;
 using Controllers.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Util;
 
 namespace Controllers
 {
@@ -33,6 +34,11 @@ namespace Controllers
             {
                 return;
             }
+
+            var ss = UIHelper.GetObjectUnderClick<GameObject>();
+            
+            
+            print(ss);
 
             SetAttackAnimation(AttackAnimationState.Attack);
             // StartCoroutine(FinishAttackAnimation());
